@@ -1,78 +1,73 @@
 import java.util.LinkedList;
 import java.util.List;
 
-public class Concursante {
+public class Concursante implements Comparable<Concursante> {
 	private List<Tiro> tiros = new LinkedList<Tiro>();
 	private int idConcursante;
-	private static int ContadorConcursantes=1;
-	
-	public Concursante(){
-		this.idConcursante=ContadorConcursantes++;
+	private static int ContadorConcursantes = 1;
+	private boolean descalificado=false;
+	private double consistencia;
+
+	public Concursante() {
+		this.idConcursante = ContadorConcursantes++;
 	}
-	
+
 	public void agregarTiro(Tiro tiros) {
+		if(tiros.porcentajeTiro() == 0)
+			this.descalificado=true;
 		this.tiros.add(tiros);
+	}
+
+	public boolean estaDescalificado() {
+		return descalificado;
 	}
 
 	public int getIdConcursante() {
 		return idConcursante;
 	}
-	
-	public double obtenerConsistenciaTiros() {
-		///hacer varianza (?????????
-		
-		return 0.1;
+
+	public void obtenerConsistenciaTiros() {
+		Tiro promedioTiros=getMeanTiro();
+		double tempD = 0;
+		double tempA = 0; 
+		for (Tiro a : this.tiros) {
+			tempD += Math.pow(a.getDistancia() - promedioTiros.getDistancia(), 2);
+			tempA += Math.pow(a.getAngulo() - promedioTiros.getAngulo(),2);
+		}
+		this.consistencia=( (tempD / ( this.tiros.size() - 1)) + ( tempA / (this.tiros.size() - 1)) ) /2;
+	}/// Hago un promedio entre las dos varianzas para obtener la consistencia del tiro
+
+	public double getConsistencia() {
+		return consistencia;
 	}
-//	public double getVariance() {
-//        double mean = getMean();
-//        double temp = 0;
-//        for(double a : data)
-//            temp += (a-mean)*(a-mean);
-//        return temp/(size-1);
-//	}
-//	
-//	public double getMean() {
-//        double sum = 0.0;
-//        for(double a : data)
-//            sum += a;
-//        return sum/size;
-//    }
-	
-	public double getVarianceDistancia() {
-        double mean = getMeanDistancia();
-        double temp = 0;
-        for(Tiro a : this.tiros)
-            temp += (a.getDistancia()-mean)*(a.getDistancia()-mean);
-        return temp/(this.tiros.size()-1);
-	}
-	
-	public double getMeanDistancia() {
-     
-        return obtenerDistanciaTiros()/this.tiros.size();
-    }
-	
-	public double getVarianceAngulo() {
-        double mean = getMeanAngulo();
-        double temp = 0;
-        for(Tiro a : this.tiros)
-            temp += (a.getAngulo()-mean)*(a.getAngulo()-mean);
-        return temp/(this.tiros.size()-1);
+
+	public Tiro getMeanTiro() {
+		double sumaDistancia=0;
+		double sumaAngulo=0;
+		for (Tiro tiro : tiros) {
+			sumaDistancia+=tiro.getDistancia();
+			sumaAngulo+=tiro.getAngulo();
+		}
+		return  new Tiro(sumaDistancia/tiros.size(),sumaAngulo/tiros.size());
 	}
 	
 	public double getMeanAngulo() {
-        double sum = 0;
-        for(Tiro a : this.tiros)
-            sum += a.getDistancia();
-        return sum/this.tiros.size();
-    }
-        
-	
+		double sum = 0;
+		for (Tiro a : this.tiros)
+			sum += a.getAngulo();
+		return sum / this.tiros.size();
+	}
+
 	public double obtenerDistanciaTiros() {
-		double acumuladorDistancia=0;
-		for(Tiro t : this.tiros) {
-			acumuladorDistancia+=t.porcentajeTiro(t)*t.getDistancia();		
+		double acumuladorDistancia = 0;
+		for (Tiro t : this.tiros) {
+			acumuladorDistancia += t.porcentajeTiro() * t.getDistancia();
 		}
 		return acumuladorDistancia;
 	}
-}
 
+	@Override
+	public int compareTo(Concursante concursante) {
+		return -(int) (this.obtenerDistanciaTiros() - concursante.obtenerDistanciaTiros());
+	}///Quiero comparar de mayor a menor
+}
