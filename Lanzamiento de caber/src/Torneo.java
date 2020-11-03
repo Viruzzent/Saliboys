@@ -2,8 +2,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
-
 public class Torneo {
 	private List<Concursante> concursantes = new ArrayList<Concursante>();
 
@@ -11,8 +9,9 @@ public class Torneo {
 		return this.concursantes.add(concursante);
 	}
 
-	public List<Concursante> podioConsistencia() {
-		List<Concursante> consistentes= new ArrayList<Concursante>();
+	public int[] podioConsistencia() {
+		List<Concursante> consistentes = new ArrayList<Concursante>();
+		
 		// recorrer la lista de concursantes
 		for ( Concursante concur : this.concursantes) {
 			if( ! concur.estaDescalificado() ) {
@@ -20,19 +19,30 @@ public class Torneo {
 				consistentes.add(concur);
 			}
 		}
+		
+		int [] podioResultado = new int[3];
+		if(consistentes.size() < 3)
+			podioResultado = new int[consistentes.size()];
+		
 		consistentes.sort(new ComparadorPorConsistencia());
-	    int cantidadGanadores = consistentes.size()>3 ? 3 : consistentes.size();
-		List<Concursante> podioConsistencia = consistentes.subList(0, cantidadGanadores);
-		return podioConsistencia;
+		
+		for(int i = 0; i < podioResultado.length; i++) {
+			Concursante c = consistentes.remove(0);
+			podioResultado[i] = c.getIdConcursante();
+		}
+			
+		return podioResultado;
 	}
+	
 
 	public int[] podioDistancia() {
 		// recorrer la lista de concursantes
 		int [] podio = new int [3];
-		Collections.sort(concursantes);
+		Collections.sort(this.concursantes, Collections.reverseOrder());
 		// ver que concursantes con la mayor distancia
-	    for(int i =0 ; i < 3 ; i ++)
-	    	podio [i]= concursantes.get(i).getIdConcursante();
+	    for(int i = 0; i < 3 ; i++) 
+	    	podio [i] = concursantes.get(i).getIdConcursante();
+
 		return podio;
 	}
 }

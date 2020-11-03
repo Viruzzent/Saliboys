@@ -4,16 +4,11 @@ import java.util.List;
 public class Concursante implements Comparable<Concursante> {
 	private List<Tiro> tiros = new LinkedList<Tiro>();
 	private int idConcursante;
-	private static int ContadorConcursantes = 1;
 	private boolean descalificado=false;
 	private double consistencia;
-
-	public Concursante() {
-		this.idConcursante = ContadorConcursantes++;
-	}
-
+	
 	public void agregarTiro(Tiro tiros) {
-		if(tiros.porcentajeTiro() == 0)
+		if(tiros.porcentajeTiro() == 0.0)
 			this.descalificado=true;
 		this.tiros.add(tiros);
 	}
@@ -26,6 +21,10 @@ public class Concursante implements Comparable<Concursante> {
 		return idConcursante;
 	}
 
+	public void setIdConcursante(int idConcursante) {
+		this.idConcursante = idConcursante;
+	}
+	
 	public void obtenerConsistenciaTiros() {
 		Tiro promedioTiros=getMeanTiro();
 		double tempD = 0;
@@ -68,6 +67,13 @@ public class Concursante implements Comparable<Concursante> {
 
 	@Override
 	public int compareTo(Concursante concursante) {
-		return -(int) (this.obtenerDistanciaTiros() - concursante.obtenerDistanciaTiros());
+		double cmp = this.obtenerDistanciaTiros() - concursante.obtenerDistanciaTiros();
+		int cmpResultado = 0;
+		if(cmp > 0)
+			cmpResultado = 1;
+		else if(cmp < 0)
+			cmpResultado = -1;
+		
+		return cmpResultado;
 	}///Quiero comparar de mayor a menor
 }
